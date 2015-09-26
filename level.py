@@ -5,7 +5,7 @@ class Level:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("single_tile.png"))
+        self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("single_tile.bmp"))
 
     def draw(self):
         for x in range(-self.width//2, self.width//2):
