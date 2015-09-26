@@ -24,6 +24,12 @@ def setupMessages():
     i1 = createMsgStruct(1, True)
     i1.addChars(2)
 
+    test = createMsgStruct(2, False)
+    test.addString()
+
+    testOut = createMsgStruct(2, True)
+    testOut.addString()
+
 class Client:
     def __init__(self, socket, pID):
         self.socket = socket
@@ -39,6 +45,11 @@ class Client:
             name = packet.read()
             self.confirm()
 
+        if msgID == 2:
+            print(packet.read())
+            self.socket.newPacket(2)
+            self.socket.write("Hello from the server")
+            self.socket.send()
     # Called to confirm to the client that the have been accepted, post sending us their details
     def confirm(self):
         self.socket.newPacket(1)
