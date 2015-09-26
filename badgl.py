@@ -92,10 +92,11 @@ def print_log(shader):
         print (log.value)
         print ("done printing log")
 
-def createDL(width, height, program):
+def createDL(width, height, program, texture):
     newList = glGenLists(1)
     glNewList(newList, GL_COMPILE)
-    glUseProgram(program)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    #glUseProgram(program)
     glBegin(GL_QUADS)
 
     #bottom left
@@ -122,6 +123,11 @@ def make_and_setup_window(width, height):
     glMatrixMode(GL_MODELVIEW)
     glEnable(GL_DEPTH_TEST)
 
+    #texturing
+    glEnable(GL_TEXTURE_2D)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
 def start_drawing():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
@@ -132,7 +138,7 @@ def end_drawing():
     pygame.display.flip()
 
 class SquareObject:
-    def __init__(self, width, height):
+    def __init__(self, width, height, texture):
         self.program = compile_program('''
         // Vertex program
         varying vec3 pos;
@@ -142,13 +148,16 @@ class SquareObject:
         }
         ''', '''
         // Fragment program
+        //uniform sampler2D tex;
         varying vec3 pos;
         void main() {
             gl_FragColor.rgb = pos.xyz;
+            //gl_FragColor.rgb = gl_FragColor.rgb * pos.xyz;
+            //gl_FragColor.rgb = texture2D(tex, gl_TexCoord[0].st).rgb;
         }
         ''')
 
-        self.draw_list = createDL(width, height, self.program)
+        self.draw_list = createDL(width, height, self.program, texture)
         self.x = 0
         self.y = 0
         self.z = 0
@@ -158,11 +167,22 @@ class SquareObject:
         glCallList(self.draw_list)
         glTranslate(-self.x, -self.y, -self.z)
 
+def loadImage(path):
+    tex_surface = pygame.image.load(path)
+    tex_data = pygame.image.tostring(tex_surface, "RGBA", 1)
+    width = tex_surface.get_width()
+    height = tex_surface.get_height()
+    texture = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texture)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
+    return texture
 
 if __name__ == '__main__':
 
     make_and_setup_window(640, 480)
-    square = SquareObject(1.5, 1.5)
+    square = SquareObject(1.5, 1.5, loadImage("single_tile.png"))
 
     quit = False
     x_pos = 0
