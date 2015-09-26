@@ -113,6 +113,8 @@ function startConnection() {
 
 function handleTurnStart(){
     if (!player.isDead) {
+         $("#button_console").show();
+         $("#end_turn").show();
          $("#message").text("It's your turn!");
         turn = true;
         console.log("turn handled");   
@@ -122,6 +124,8 @@ function handleTurnStart(){
 }
 
 function handleTurnOver(){
+         $("#button_console").hide();
+         $("#end_turn").hide();
          $("#message").text("'Waiting on other players");
         turn = false;
         console.log("turn over");   

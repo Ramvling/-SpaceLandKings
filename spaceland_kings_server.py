@@ -176,8 +176,10 @@ def main():
             elif key_map[K_ESCAPE]:
                 quit = True
             elif key_map[K_SPACE]:
-                for client in clients:
-                    client.startTurn()
+                if serverTurn:
+                    serverTurn = False
+                    for client in clients:
+                         client.startTurn()
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)
