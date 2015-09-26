@@ -31,11 +31,8 @@ def setupMessages():
     test = createMsgStruct(2, False)
     test.addString()
 
-    turn = createMsgStruct(3, True)
-    turn.addChars(1)
-
-    clientTurnOver = createMsgStruct(3, False)
-    clientTurnOver.addChars(1)
+    turnStart = createMsgStruct(3, True)
+    turnStart.addChars(1)
 class Client:
     def __init__(self, socket, pID):
         self.socket = socket
@@ -75,8 +72,6 @@ class Client:
                 self.position[2] += 1
             elif (dirr == "Down"):
                 self.position[2] += -1
-        if msgID == 3:
-            readyClients.append(self)
 
     # Called to confirm to the client that the have been accepted, post sending us their details
     def confirm(self):
@@ -89,11 +84,13 @@ class Client:
         clients.remove(self)
         self.socket = None
         return
-
+    
     def startTurn(self):
         self.socket.newPacket(3)
         self.socket.write('s')
         self.socket.send()
+
+
 # this handles a new client
 def handle(socket):
     global pID, clients
@@ -101,13 +98,10 @@ def handle(socket):
     client = Client(socket, pID)
     clients.append(client)
 
+
 myo_pos_change = 11
 
 def main():
-
-    if len(readyClients) == len(clients):
-        serverTurn = True;
-        print("server turn");
     badgl.make_and_setup_window(800, 800)
 
     square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.bmp"))
@@ -164,7 +158,9 @@ def main():
                 square.x += myo_pos_change
                 #print(myo_pos_change)
             #else:
+            print("rawr")
             key_map = pygame.key.get_pressed()
+            print(key_map)
             if key_map[K_LEFT]:
                 square.x += -1
             elif key_map[K_RIGHT]:
@@ -175,9 +171,6 @@ def main():
                 square.y -= 1
             elif key_map[K_ESCAPE]:
                 quit = True
-            elif key_map[K_SPACE]:
-                for client in clients:
-                    client.startTurn()
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)

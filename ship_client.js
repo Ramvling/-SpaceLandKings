@@ -2,10 +2,11 @@
 var MSG_LOGIN = 1;
 var MOVE_INPUT = 2;
 var TURN = 3;
+
 var INCOMING = false;
 var OUTGOING = true;
-var player = {position:[0,0,0],moves:10, health:100,isDead:false, missles:3, bombs:3};
-
+var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3};
+var turn = true;
 
 function handleMovement(dirr) {
     if (player.moves > 0) {
@@ -13,6 +14,7 @@ function handleMovement(dirr) {
         var packet = newPacket(MOVE_INPUT);
         packet.write(dirr); 
         packet.send();
+        $("#moves").text(player.moves);
     }
 }
 
@@ -72,6 +74,9 @@ function setupMessages() {
 
     var turn = createMsgStruct(TURN, INCOMING);
    turn.addChars(1);
+
+    var done = createMsgStruct(TURN, OUTGOING);
+    done.addChars(1);
 }
 
 function startConnection() {
@@ -102,6 +107,24 @@ function startConnection() {
     wsconnect("ws://localhost:8886", onopen, onclose);
 }
 
+function handleTurnStart(){
+    if (!player.isDead) {
+         $("#message").text("It's your turn!");
+        turn = true;
+        console.log("turn handled");   
+        player.moves += player.regen;
+        $("#moves").text(player.moves);
+    }
+}
+
+function handleTurnOver(){
+         $("#message").text("'Waiting on other players");
+        turn = false;
+        console.log("turn over");   
+        var packet = newPacket(TURN);
+        packet.write('o'); 
+        packet.send();
+}
 // This function handles incoming packets
 function handleNetwork() {
     // First we check if we have enough data
@@ -125,20 +148,23 @@ function handleNetwork() {
     if (msgID == MOVE_INPUT) {
         console.log(packet.read());
     }
+
+    if (msgID == TURN) {
+        console.log("turn start");
+        handleTurnStart();
+    }
 }
 
 //sync player with server?
 
-function handleTurn(){
-    if ((!player.isDead) && (player.moves > 0)) {
-        
-    }
-}
+
 // This is called every 15 millis, and is currently used to
 // handle incoming messaged. This can do more.
 function gameLoop() {
     handleNetwork();
-    
+   if (player.moves <= 0) {
+        handleTurnOver();
+    } 
 }
 
 // Does a simple httpGet request. Not used in this example.
