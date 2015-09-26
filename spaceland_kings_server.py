@@ -36,6 +36,7 @@ class Client:
     def __init__(self, socket, pID):
         self.socket = socket
         self.pID = pID
+        self.position = [0, 0, 0]
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
         self.square.z = 1
 
@@ -53,10 +54,21 @@ class Client:
             self.confirm()
 
         if msgID == 2:
-            print(packet.read())
-            self.socket.newPacket(2)
-            self.socket.write("Hello from the server")
-            self.socket.send()
+            dirr = packet.read()
+            print(dirr)
+            if (dirr == "Forwards"):
+                self.position[1] += 1
+            elif (dirr == "Backwards"):
+                self.position[1] += -1
+            elif (dirr == "Right"):
+                self.position[1] += 1
+            elif (dirr == "Left"):
+                self.position[0] -= 1
+            elif (dirr == "Up"):
+                self.position[2] += 1
+            elif (dirr == "Down"):
+                self.position[2] += -1
+
     # Called to confirm to the client that the have been accepted, post sending us their details
     def confirm(self):
         self.socket.newPacket(1)
