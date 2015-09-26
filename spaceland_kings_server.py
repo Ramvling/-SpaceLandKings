@@ -37,6 +37,10 @@ class Client:
         self.socket = socket
         self.pID = pID
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
+        self.square.z = 1
+
+    def draw(self):
+        self.square.draw()
 
     def handle(self):
         global pID
@@ -146,6 +150,8 @@ def main():
             badgl.start_drawing()
             glTranslate(1, 1, -5)
             lvl.draw()
+            for client in clients:
+                client.draw()
             square.draw()
             badgl.end_drawing()
             #sleep(0.01)
