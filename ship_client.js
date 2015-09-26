@@ -112,8 +112,8 @@ function startConnection() {
     }
 
     // Start the connection!
-    wsconnect("ws://128.61.70.189:8886", onopen, onclose);
-    //wsconnect("ws://localhost:8886", onopen, onclose);
+    //wsconnect("ws://128.61.70.189:8886", onopen, onclose);
+    wsconnect("ws://localhost:8886", onopen, onclose);
 }
 
 function handleTurnStart(){
@@ -177,8 +177,15 @@ function handleNetwork() {
     }
 
     if (msgID == SCORE) {
-        player.score = packet.read();
+        var msg = packet.read().split(" ");
+        player.score = msg[0];
         $("#score").text(player.score);
+        $("#position").text(msg[1]);
+    }
+
+    if (msgID == HEALTH) {
+        var msg = packet.read();
+        player.health = parseInt(msg)
     }
 }
 

@@ -20,6 +20,8 @@ clients = []
 pID = 0
 serverTurn = False
 readyClients = []
+liveProjectiles = []
+dead = []
 
 def setupMessages():
     m1 = createMsgStruct(1, False)
@@ -40,6 +42,12 @@ def setupMessages():
     sendScore = createMsgStruct(4, True)
     sendScore.addString()
 
+    sendDamage = createMsgStruct(5, True)
+    sendDamage.addString()
+
+    projectile = createMsgStruct(6, False)
+    projectile.addString()
+
 class Client:
     def __init__(self, socket, pID):
         self.socket = socket
@@ -48,6 +56,18 @@ class Client:
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
         self.square.z = 1
         self.diamondillium = 0
+        self.health = 100
+
+    def hurt(self, damage):
+        self.health -= damage
+        self.socket.newPacket(5)
+        self.socket.write(str(self.health))
+        self.socket.send()       
+        print("damage")
+
+    def formatPosition(self):
+        return ("(" + str(self.position[0]) + ',' + str(self.position[1]) + ',' + str(self.position[2]) + ")")
+    
 
     def draw(self):
         self.square.x = self.position[0]
@@ -58,7 +78,7 @@ class Client:
     def handle(self, lvl):
         #send score update
         self.socket.newPacket(4)
-        self.socket.write(str(self.diamondillium))
+        self.socket.write(str(self.diamondillium) + ' ' + self.formatPosition())
         self.socket.send()
 
         global pID
@@ -117,6 +137,35 @@ def handle(socket):
     client = Client(socket, pID)
     clients.append(client)
 
+
+def vecAdd(a,b):
+    return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]
+def vecMult(a,b):
+    return [a[0]*b,a[1]*b,a[2]*b]
+
+class Projectile:
+    def __init__(self, speed, dirrection, size, position, damage):
+        self.speed = speed
+        self.dirrection = dirrection
+        self.position = position
+        self.size = size
+        self.damage = damage
+        self.dead = False
+
+    def move(self):
+            self.position = vecAdd(vecMult(self.dirrection, self.speed), self.position)
+            print(self.position);
+
+    def collide(self, client):
+        dist = (self.position[0] - client.position[0])**2 + (self.position[1] - client.position[1])**2 + (self.position[2] - client.position[2])**2
+        dist = dist**0.5
+        if (dist <= size):
+            return True
+
+        else:
+            return False
+        
+
 class ServerPlayer:
     def __init__(self, moves, regen):
         self.x = 0
@@ -132,10 +181,11 @@ class ServerPlayer:
         self.square.z = self.z
         self.square.draw()
 
+        
 myo_pos_change = 11
-
 def main():
     global readyClients
+    print("rawr")
 
     if len(readyClients) == len(clients):
         serverTurn = True;
@@ -144,7 +194,7 @@ def main():
 
     server_player = ServerPlayer(10, 10)
     server_player.z = 1
-
+    
     lvl_size = 13
     lvl = level.Level(lvl_size, lvl_size)
     lvl.z = -1
@@ -154,6 +204,8 @@ def main():
 
     global gameStarted
     global stage
+
+
     using_myo = False
     if (len(sys.argv) > 1):
         using_myo = True
@@ -193,6 +245,22 @@ def main():
             for client in clients:
                 client.handle(lvl)
 
+            dead = []
+            #projectiles loop
+            for proj in liveProjectiles:
+                print("proj loop")
+                proj.move()
+                for client in clients:
+                    if proj.collide(client):
+                        client.hurt(proj.damage)
+                        proj.dead = True
+                        dead.append(proj)
+
+            for proj in dead:
+                liveProjectiles.remove(proj)
+
+
+
             if len(readyClients) == len(clients) and not serverTurn:
                 serverTurn = True;
                 print("server turn on in while");
@@ -225,6 +293,9 @@ def main():
                     server_player.y -= 1
                     server_player.moves -=1
                     count = 0
+                elif key_map[K_TAB]:
+                    liveProjectiles.append(Projectile( 2, [0, 1, 0], 1, [0,0,0], 1))
+                    print(liveProjectiles)
                 if key_map[K_SPACE] or server_player.moves <= 0:
                     print("end of server turn")
                     server_player.moves = server_player.regen
