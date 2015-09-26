@@ -7,13 +7,13 @@ var INCOMING = false;
 var OUTGOING = true;
 var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3};
 var turn = true;
+var commandString = ""
 
 function handleMovement(dirr) {
     if (player.moves > 0) {
+        commandString += dirr + " ";
        player.moves -= 1;
-        var packet = newPacket(MOVE_INPUT);
-        packet.write(dirr); 
-        packet.send();
+        $("#commands").text(commandString);
         $("#moves").text(player.moves);
     }
 }
@@ -26,6 +26,10 @@ $(document).ready(function() {
     $("#login").click(function() {
         startConnection();
         
+    });
+
+    $("#end_turn").click(function() {
+        handleTurnOver();
     });
 
     $("#up").click(function() {
@@ -121,9 +125,17 @@ function handleTurnOver(){
          $("#message").text("'Waiting on other players");
         turn = false;
         console.log("turn over");   
-        var packet = newPacket(TURN);
-        packet.write('o'); 
+         var packet = newPacket(MOVE_INPUT);
+        packet.write(commandString); 
+        commandString = "";
         packet.send();
+        $("#moves").text(player.moves);
+        $("#commands").text(commandString);
+
+        //note, when we do the whole big string thing at the end, this kind of message can be deleted
+       // var packet = newPacket(TURN);
+      //  packet.write('o'); 
+       // packet.send();
 }
 // This function handles incoming packets
 function handleNetwork() {

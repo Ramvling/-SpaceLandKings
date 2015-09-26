@@ -61,20 +61,20 @@ class Client:
             self.confirm()
 
         if msgID == 2:
-            dirr = packet.read()
-            print(dirr)
-            if (dirr == "Forward"):
-                self.position[1] += 1
-            elif (dirr == "Backward"):
-                self.position[1] += -1
-            elif (dirr == "Right"):
-                self.position[0] += 1
-            elif (dirr == "Left"):
-                self.position[0] -= 1
-            elif (dirr == "Up"):
-                self.position[2] += 1
-            elif (dirr == "Down"):
-                self.position[2] += -1
+            dirrections = packet.read().split(" ")
+            for dirr in dirrections:
+                if (dirr == "Forward"):
+                    self.position[1] += 1
+                elif (dirr == "Backward"):
+                    self.position[1] += -1
+                elif (dirr == "Right"):
+                    self.position[0] += 1
+                elif (dirr == "Left"):
+                    self.position[0] -= 1
+                elif (dirr == "Up"):
+                    self.position[2] += 1
+                elif (dirr == "Down"):
+                    self.position[2] += -1
         if msgID == 3:
             readyClients.append(self)
 
