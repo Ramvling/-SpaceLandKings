@@ -37,7 +37,7 @@ def setupMessages():
     clientTurnOver = createMsgStruct(3, False)
     clientTurnOver.addChars(1)
 
-    sendScore = createMsgStruct(4, False)
+    sendScore = createMsgStruct(4, True)
     sendScore.addString()
 
 class Client:
@@ -47,7 +47,7 @@ class Client:
         self.position = [0, 0, 0]
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
         self.square.z = 1
-        self.dimadillium = 0
+        self.diamondillium = 0
 
     def draw(self):
         self.square.x = self.position[0]
@@ -55,9 +55,9 @@ class Client:
         self.square.z = self.position[2]
         self.square.draw()
 
-    def handle(self):
+    def handle(self, lvl):
         #send score update
-        self.socket.newPacket()
+        self.socket.newPacket(4)
         self.socket.write(str(self.diamondillium))
         self.socket.send()
 
@@ -85,6 +85,7 @@ class Client:
                     self.position[2] += 1
                 elif (dirr == "Down"):
                     self.position[2] += -1
+                lvl.events.runEvent(tuple(self.position), self)
             # since we don't need to do turn over naymore
             print("moving and appending to readyClients")
             readyClients.append(self)
@@ -190,7 +191,7 @@ def main():
                 handle(newClient)
                 print("New connection")
             for client in clients:
-                client.handle()
+                client.handle(lvl)
 
             if len(readyClients) == len(clients) and not serverTurn:
                 serverTurn = True;

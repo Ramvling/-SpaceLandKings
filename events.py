@@ -5,22 +5,22 @@ class Event:
         self.name = name
 
 class EventManager:
-    def __init__(self):
-        self.events = []
+    def __init__(self, events):
+        self.events = events
         self.positions = {}
+        self.populatePositions()
 
-    def populatePositions():
+    def populatePositions(self):
         for event in self.events:
             for position in event.positions:
                 self.positions[position] = event
 
-    def getEvent(position):
+    def getEvent(self, position):
         return self.positions[position]
 
-    def runEvent(position):
-        event = self.positions[position]
-        if event != None:
-            event.onEvent()
+    def runEvent(self, position, triggering_object):
+        if position in self.positions:
+            self.positions[position].onEvent(triggering_object)
 
 
 ## On Even Definitions go here
