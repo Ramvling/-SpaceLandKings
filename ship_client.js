@@ -14,11 +14,43 @@ $(document).ready(function() {
         
     });
 
-    $("#gameTest").click(function() {
+    $("#up").click(function() {
         var packet = newPacket(MOVE_INPUT);
-        packet.write("This is a message");
+        packet.write("Up");
         packet.send();
     });
+
+     $("#down").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("Down");
+        packet.send();
+    });
+
+
+    $("#left").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("Left");
+        packet.send();
+    });
+
+    $("#right").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("Right");
+        packet.send();
+    });
+
+    $("#forward").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("Forward");
+        packet.send();
+    });
+
+    $("#backward").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("Backward");
+        packet.send();
+    });
+
     // This interval can be used for anything, but it currently only handles incoming messaged.
     setInterval(gameLoop, 15);
 });
@@ -35,8 +67,8 @@ function setupMessages() {
     i1.addString();
 
     //Test message
-    var test = createMsgStruct(MOVE_INPUT, true);
-    test.addString();
+    var move  = createMsgStruct(MOVE_INPUT, OUTGOING);
+    move.addString();
 
     var testIn = createMsgStruct(MOVE_INPUT, false);
     testIn.addString();
@@ -55,8 +87,10 @@ function startConnection() {
         $("#notify").text("Connected!");
         $("#login").hide();
         $("#name").hide();
-        $("#notify").text("Connecting...");
+        //just hiding for now, probably needs better show/hide logic. 
+        $("#notify").hide();
         $("#game").show();
+        $("#title").hide();
     }
 
     // This will be called when the connection is closed
