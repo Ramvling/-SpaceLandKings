@@ -57,12 +57,15 @@ def handle(socket):
 def main():
     global gameStarted
     global stage
-    m = Myo(NNClassifier(), None)
-    def handle_myo(it):
-        print("handling fo")
-        print(it)
-    m.add_raw_pose_handler(handle_myo)
-    m.connect()
+    using_myo = False
+    if (len(sys.argv) > 1):
+        using_myo = True
+        m = Myo(NNClassifier(), None)
+        def handle_myo(it):
+            print("handling fo")
+            print(it)
+        m.add_raw_pose_handler(handle_myo)
+        m.connect()
 
     try:
         setupMessages()
@@ -74,7 +77,8 @@ def main():
                 print("New connection")
             for client in clients:
                 client.handle()
-            m.run()
+            if using_myo:
+                m.run()
             #sleep(0.01)
     except KeyboardInterrupt:
         print(' recieved, closing server')
