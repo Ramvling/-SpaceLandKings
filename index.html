@@ -2,6 +2,7 @@
 	<head>
 		<meta name="viewport" content="width=320,uder-scalable=false"/>
 			<script src="PyWebPlug/lib/jquery-1.11.3.js"></script>
+            <LINK REL=StyleSheet HREF="client_style.css">
     </head>
     <body>
     <script src="PyWebPlug/ws-client.js"></script>
@@ -14,12 +15,28 @@
 
     <button id="login">Login</button>
     <div id="game">
-        <button id="up">Up</button>
-        <button id="down">Down</button>
-        <button id="forward">Forward</button>
-        <button id="left">Left</button>
-        <button id="backward">Backward</button>
-        <button id="right">Right</button>
+        <div id="radar">RADAR DISPLAY GOES HERE</div>
+        <div id="info">INFO DISPLAYED HERE</div>
+        <div id="button_console">
+            <div id="zconsole">
+                <button id="up" class="buttonZ">Up</button></br>
+                <button id="down" class="buttonZ">Down</button>
+            </div>
+
+                         <div id="xyconsole">
+                <center>
+                <button id="forward" class="button">Forward</button></br>
+                <button id="left" class="button">Left</button>
+                <button id="right" class="button">Right</button></br>
+                <button id="backward" class="button">Backward</button>
+            </center>
+            </div>
+           <div id="attack_console">
+                ATTACK BUTTONS GO HERE
+            </div>
+
+
+        </div>
     </div>
     </body>
 </html>
