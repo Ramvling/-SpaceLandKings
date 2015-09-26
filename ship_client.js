@@ -2,10 +2,11 @@
 var MSG_LOGIN = 1;
 var MOVE_INPUT = 2;
 var TURN = 3;
+var SCORE = 4;
 
 var INCOMING = false;
 var OUTGOING = true;
-var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3};
+var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3, score:0};
 var turn = true;
 var commandString = ""
 
@@ -81,6 +82,9 @@ function setupMessages() {
 
     var done = createMsgStruct(TURN, OUTGOING);
     done.addChars(1);
+
+    var score = createMsgStruct(SCORE, INCOMING);
+    score.addString();
 }
 
 function startConnection() {
@@ -169,6 +173,11 @@ function handleNetwork() {
     if (msgID == TURN) {
         console.log("turn start");
         handleTurnStart();
+    }
+
+    if (msgID == SCORE) {
+        player.score = packet.read();
+        $("#score").text(player.score);
     }
 }
 

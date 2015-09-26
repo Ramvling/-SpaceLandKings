@@ -36,6 +36,10 @@ def setupMessages():
 
     clientTurnOver = createMsgStruct(3, False)
     clientTurnOver.addChars(1)
+
+    sendScore = createMsgStruct(4, False)
+    sendScore.addString()
+
 class Client:
     def __init__(self, socket, pID):
         self.socket = socket
@@ -43,6 +47,7 @@ class Client:
         self.position = [0, 0, 0]
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
         self.square.z = 1
+        self.dimadillium = 0
 
     def draw(self):
         self.square.x = self.position[0]
@@ -51,6 +56,11 @@ class Client:
         self.square.draw()
 
     def handle(self):
+        #send score update
+        self.socket.newPacket()
+        self.socket.write(str(self.diamondillium))
+        self.socket.send()
+
         global pID
         if (self.socket.canHandleMsg() == False):
             return
