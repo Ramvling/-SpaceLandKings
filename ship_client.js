@@ -87,7 +87,7 @@ function setupMessages() {
     var score = createMsgStruct(SCORE, INCOMING);
     score.addString();
 
-    var gameOver = createMshStruct(GAMEOVER, INCOMING);
+    var gameOver = createMsgStruct(GAMEOVER, INCOMING);
     score.addString();
 }
 
