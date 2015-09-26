@@ -48,6 +48,10 @@ def setupMessages():
     projectile = createMsgStruct(6, False)
     projectile.addString()
 
+    gameOver = createMsgStruct(7, True)
+    gameOver.addString()
+
+
 class Client:
     def __init__(self, socket, pID):
         self.socket = socket
@@ -76,6 +80,11 @@ class Client:
         self.square.draw()
 
     def handle(self, lvl):
+        if self.health <= 0:
+            self.socket.newPacket(7)
+            self.socket.write("You are not the SpaceLand King")
+            self.socket.send()
+        
         #send score update
         self.socket.newPacket(4)
         self.socket.write(str(self.diamondillium) + ' ' + self.formatPosition())
@@ -152,11 +161,17 @@ class Projectile:
         self.size = size
         self.damage = damage
         self.dead = False
+        self.timeout = 1.0
         if Projectile.square == None:
             Projectile.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("laser_ball.bmp"))
 
     def move(self):
-            self.position = vecAdd(vecMult(self.dirrection, self.speed), self.position)
+            if not (self.dead):
+                self.position = vecAdd(vecMult(self.dirrection, self.speed), self.position)
+                #print(self.position);
+                self.timeout -= 0.002
+                if(self.timeout <= 0):
+                    self.dead = True
 
     def collide(self, client):
         dist = (self.position[0] - client.position[0])**2 + (self.position[1] - client.position[1])**2 + (self.position[2] - client.position[2])**2
@@ -184,7 +199,21 @@ class ServerPlayer:
         self.square.z = self.position[2]
         self.square.draw()
 
-        
+    def burstAttack(self):
+        i = -1.0
+        j = -1.0
+        k = -1.0
+        burst = []
+        while (i < 1.0):
+            while (j < 1.0):
+                while(k <1.0):
+                   burst.append(Projectile(0.1, [i,j,k], 0, [self.x,self.y,self.z], 1))   
+                   k += 0.3
+                j += 0.3
+            i += 0.3
+
+        liveProjectiles += burst    
+
 myo_pos_change = 11
 def main():
     global readyClients
@@ -260,9 +289,10 @@ def main():
             for proj in liveProjectiles:
                 proj.move()
                 for client in clients:
-                    if proj.collide(client):
+                    if proj.collide(client) or (proj.dead):
                         client.hurt(proj.damage)
                         proj.dead = True
+                        print("dead")
                         dead.append(proj)
 
             for proj in dead:
