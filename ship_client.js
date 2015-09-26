@@ -3,6 +3,7 @@ var MSG_LOGIN = 1;
 var MOVE_INPUT = 2;
 var TURN = 3;
 var SCORE = 4;
+var GAMEOVER = 7;
 
 var INCOMING = false;
 var OUTGOING = true;
@@ -85,6 +86,9 @@ function setupMessages() {
 
     var score = createMsgStruct(SCORE, INCOMING);
     score.addString();
+
+    var gameOver = createMshStruct(GAMEOVER, INCOMING);
+    score.addString();
 }
 
 function startConnection() {
@@ -100,6 +104,7 @@ function startConnection() {
         $("#notify").text("Connected!");
         $("#login").hide();
         $("#name").hide();
+        $('#gameOver').hide();
         //just hiding for now, probably needs better show/hide logic. 
         $("#notify").hide();
         $("#game").show();
@@ -114,6 +119,12 @@ function startConnection() {
     // Start the connection!
     //wsconnect("ws://128.61.70.189:8886", onopen, onclose);
     wsconnect("ws://localhost:8886", onopen, onclose);
+}
+
+function handleGameOver(msg) {
+    $("#game").hide();
+    $("#gameOver").show();
+    $("#gameOverMsg").text(msg);
 }
 
 function handleTurnStart(){
@@ -185,7 +196,11 @@ function handleNetwork() {
 
     if (msgID == HEALTH) {
         var msg = packet.read();
-        player.health = parseInt(msg)
+        player.health = parseInt(msg);
+    }
+
+    if (msgID == GAMEOVER) {
+        handleGameOver(packet.read());
     }
 }
 
