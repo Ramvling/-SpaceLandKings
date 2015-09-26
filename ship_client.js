@@ -1,6 +1,7 @@
 // This is where we define our messages (similar to an enum)
 var MSG_LOGIN = 1;
 var MOVE_INPUT = 2;
+var TURN = 3;
 var INCOMING = false;
 var OUTGOING = true;
 var player = {position:[0,0,0],moves:10, health:100,isDead:false, missles:3, bombs:3};
@@ -8,12 +9,13 @@ var player = {position:[0,0,0],moves:10, health:100,isDead:false, missles:3, bom
 
 function handleMovement(dirr) {
     if (player.moves > 0) {
-       player.moves -= 0;
+       player.moves -= 1;
         var packet = newPacket(MOVE_INPUT);
         packet.write(dirr); 
         packet.send();
     }
 }
+
 $(document).ready(function() {
    // Setup our message objects (packets)
     setupMessages();
@@ -68,8 +70,8 @@ function setupMessages() {
     var move  = createMsgStruct(MOVE_INPUT, OUTGOING);
     move.addString();
 
-    var testIn = createMsgStruct(MOVE_INPUT, false);
-    testIn.addString();
+    var turn = createMsgStruct(TURN, INCOMING);
+   turn.addChars(1);
 }
 
 function startConnection() {
