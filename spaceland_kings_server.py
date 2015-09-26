@@ -37,6 +37,7 @@ class Client:
         self.socket = socket
         self.pID = pID
         self.position = [0, 0, 0]
+        self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("dragon.bmp"))
 
     def handle(self):
         global pID
@@ -88,7 +89,7 @@ myo_pos_change = 11
 def main():
     badgl.make_and_setup_window(800, 800)
 
-    square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.png"))
+    square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.bmp"))
     square.z = 1
     lvl_size = 13
     lvl = level.Level(lvl_size, lvl_size)
