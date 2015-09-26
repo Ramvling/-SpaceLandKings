@@ -147,7 +147,7 @@ def main():
 
     lvl_size = 13
     lvl = level.Level(lvl_size, lvl_size)
-    lvl.z = -1
+    lvl.z = -0.1
     quit = False
     global myo_pos_change
     myo_pos_change = 0
