@@ -27,7 +27,7 @@ class Client:
 
     def handle(self):
         global pID
-        if (self.socket.canHanleMsg() == False):
+        if (self.socket.canHandleMsg() == False):
             return
         packet = self.socket.readPacket()
         msgID = packet.msgID
@@ -71,6 +71,7 @@ def main():
             newClient = handleNetwork()
             if newClient:
                 handle(newClient)
+                print("New connection")
             for client in clients:
                 client.handle()
             m.run()
