@@ -1,20 +1,24 @@
 // This is where we define our messages (similar to an enum)
 var MSG_LOGIN = 1;
-
-console.log("rawr");
+var MOVE_INPUT = 2;
+var INCOMING = false;
+var OUTGOING = true;
 
 $(document).ready(function() {
-    console.log("rawr");
    // Setup our message objects (packets)
     setupMessages();
+    $("#game").hide();
 
     $("#login").click(function() {
         startConnection();
-        $("#login").hide();
-        $("#name").hide();
-        $("#notify").text("Connecting...");
+        
     });
 
+    $("#gameTest").click(function() {
+        var packet = newPacket(MOVE_INPUT);
+        packet.write("This is a message");
+        packet.send();
+    });
     // This interval can be used for anything, but it currently only handles incoming messaged.
     setInterval(gameLoop, 15);
 });
@@ -29,11 +33,17 @@ function setupMessages() {
     var i1 = createMsgStruct(MSG_LOGIN, true);
     // This packet sends a string (our name) to the server
     i1.addString();
+
+    //Test message
+    var test = createMsgStruct(MOVE_INPUT, true);
+    test.addString();
+
+    var testIn = createMsgStruct(MOVE_INPUT, false);
+    testIn.addString();
 }
 
 function startConnection() {
     // This will be called when the connection is successful 
-    console.log("start connection called");
     var onopen = function() {
         // We ask for a new packet for type MSG_LOGIN
         var packet = newPacket(MSG_LOGIN);
@@ -43,6 +53,10 @@ function startConnection() {
         // and then we send the packet!
         packet.send();
         $("#notify").text("Connected!");
+        $("#login").hide();
+        $("#name").hide();
+        $("#notify").text("Connecting...");
+        $("#game").show();
     }
 
     // This will be called when the connection is closed
@@ -72,6 +86,10 @@ function handleNetwork() {
     if (msgID === MSG_LOGIN) {
         var pid = packet.read();
         alert("You are client number " + pid);
+    }
+
+    if (msgID == MOVE_INPUT) {
+        console.log(packet.read());
     }
 }
 
