@@ -12,6 +12,8 @@ from time import sleep
 import pygame
 from pygame.locals import *
 import badgl
+import level
+from OpenGL.GL import *
 
 
 clients = []
@@ -72,8 +74,12 @@ def handle(socket):
 myo_pos_change = 11
 
 def main():
-    badgl.make_and_setup_window(640, 480)
-    square = badgl.SquareObject(1.0, 1.0)
+    badgl.make_and_setup_window(800, 800)
+
+    square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.png"))
+    square.z = 1
+    lvl_size = 13
+    lvl = level.Level(lvl_size, lvl_size)
     quit = False
     global myo_pos_change
     myo_pos_change = 0
@@ -88,12 +94,18 @@ def main():
             global myo_pos_change
             print("handling fo")
             print(it)
-            if (it > 2):
+            if (it == 0):
+                myo_pos_change = 0
+            elif it == 1:
+                myo_pos_change = 1
+            elif it == 2:
                 myo_pos_change = -1
-            elif it > 0:
+            elif it == 3:
+                myo_pos_change = 1
+            elif it == 4:
                 myo_pos_change = 1
             else:
-                it = 11
+                it = 0
             print(myo_pos_change)
         m.add_raw_pose_handler(handle_myo)
         m.connect()
@@ -123,10 +135,16 @@ def main():
                 square.x += -1
             elif key_map[K_RIGHT]:
                 square.x += 1
+            elif key_map[K_UP]:
+                square.y += 1
+            elif key_map[K_DOWN]:
+                square.y -= 1
             elif key_map[K_ESCAPE]:
                 quit = True
             
             badgl.start_drawing()
+            glTranslate(1, 1, -5)
+            lvl.draw()
             square.draw()
             badgl.end_drawing()
             #sleep(0.01)
