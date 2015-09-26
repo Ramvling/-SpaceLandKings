@@ -41,6 +41,9 @@ class Client:
         self.square.z = 1
 
     def draw(self):
+        self.square.x = self.position[0]
+        self.square.y = self.position[1]
+        self.square.z = self.position[2]
         self.square.draw()
 
     def handle(self):
@@ -56,12 +59,12 @@ class Client:
         if msgID == 2:
             dirr = packet.read()
             print(dirr)
-            if (dirr == "Forwards"):
+            if (dirr == "Forward"):
                 self.position[1] += 1
-            elif (dirr == "Backwards"):
+            elif (dirr == "Backward"):
                 self.position[1] += -1
             elif (dirr == "Right"):
-                self.position[1] += 1
+                self.position[0] += 1
             elif (dirr == "Left"):
                 self.position[0] -= 1
             elif (dirr == "Up"):
