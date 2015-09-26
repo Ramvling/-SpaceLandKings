@@ -186,10 +186,11 @@ def main():
                 elif key_map[K_DOWN]:
                     square.y -= 1
                 elif key_map[K_SPACE]:
-                    serverTurn = False
-                    for client in clients:
-                        client.startTurn()
-                    readyClients = []
+                    if serverTurn:
+                        serverTurn = False
+                        for client in clients:
+                            client.startTurn()
+                        readyClients = []
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)
