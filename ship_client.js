@@ -3,7 +3,17 @@ var MSG_LOGIN = 1;
 var MOVE_INPUT = 2;
 var INCOMING = false;
 var OUTGOING = true;
+var player = {position:[0,0,0],moves:10, health:100,isDead:false, missles:3, bombs:3};
 
+
+function handleMovement(dirr) {
+    if (player.moves > 0) {
+       player.moves -= 0;
+        var packet = newPacket(MOVE_INPUT);
+        packet.write(dirr); 
+        packet.send();
+    }
+}
 $(document).ready(function() {
    // Setup our message objects (packets)
     setupMessages();
@@ -15,40 +25,28 @@ $(document).ready(function() {
     });
 
     $("#up").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Up");
-        packet.send();
+       handleMovement("Up"); 
     });
 
      $("#down").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Down");
-        packet.send();
+       handleMovement("Down"); 
     });
 
 
     $("#left").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Left");
-        packet.send();
+      handleMovement("Left");  
     });
 
     $("#right").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Right");
-        packet.send();
+        handleMovement("Right");
     });
 
     $("#forward").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Forward");
-        packet.send();
+        handleMovement("Forward");
     });
 
     $("#backward").click(function() {
-        var packet = newPacket(MOVE_INPUT);
-        packet.write("Backward");
-        packet.send();
+        handleMovement("Backward");
     });
 
     // This interval can be used for anything, but it currently only handles incoming messaged.
@@ -127,10 +125,18 @@ function handleNetwork() {
     }
 }
 
+//sync player with server?
+
+function handleTurn(){
+    if ((!player.isDead) && (player.moves > 0)) {
+        
+    }
+}
 // This is called every 15 millis, and is currently used to
 // handle incoming messaged. This can do more.
 function gameLoop() {
     handleNetwork();
+    
 }
 
 // Does a simple httpGet request. Not used in this example.
