@@ -76,8 +76,11 @@ class Client:
                 elif (dirr == "Down"):
                     self.position[2] += -1
             # since we don't need to do turn over naymore
+            print("moving and appending to readyClients")
             readyClients.append(self)
+            print(len(readyClients))
         if msgID == 3:
+            print("messag id 3")
             readyClients.append(self)
 
     # Called to confirm to the client that the have been accepted, post sending us their details
@@ -103,6 +106,21 @@ def handle(socket):
     client = Client(socket, pID)
     clients.append(client)
 
+class ServerPlayer:
+    def __init__(self, moves, regen):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+        self.moves = moves
+        self.regen = regen
+        self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.bmp"))
+
+    def draw(self):
+        self.square.x = self.x
+        self.square.y = self.y
+        self.square.z = self.z
+        self.square.draw()
+
 myo_pos_change = 11
 
 def main():
@@ -113,10 +131,12 @@ def main():
         print("server turn");
     badgl.make_and_setup_window(800, 800)
 
-    square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.bmp"))
-    square.z = 1
+    server_player = ServerPlayer(10, 10)
+    server_player.z = 1
+
     lvl_size = 13
     lvl = level.Level(lvl_size, lvl_size)
+    lvl.z = -1
     quit = False
     global myo_pos_change
     myo_pos_change = 0
@@ -164,40 +184,54 @@ def main():
 
             if len(readyClients) == len(clients) and not serverTurn:
                 serverTurn = True;
-                print("server turn");
+                print("server turn on in while");
+                print(len(readyClients))
 
             if using_myo:
                 myo_pos_change = 0
                 m.run()
                 if serverTurn:
-                    square.x += myo_pos_change
+                    server_player.x += myo_pos_change
                 #print(myo_pos_change)
             #else:
             key_map = pygame.key.get_pressed()
             if key_map[K_ESCAPE]:
                 quit = True
-            if serverTurn:
+            if serverTurn and count > 10:
                 if key_map[K_LEFT]:
-                    square.x += -1
+                    server_player.x += -1
+                    server_player.moves -=1
+                    count = 0
                 elif key_map[K_RIGHT]:
-                    square.x += 1
+                    server_player.x += 1
+                    server_player.moves -=1
+                    count = 0
                 elif key_map[K_UP]:
-                    square.y += 1
+                    server_player.y += 1
+                    server_player.moves -=1
+                    count = 0
                 elif key_map[K_DOWN]:
-                    square.y -= 1
-                elif key_map[K_SPACE]:
-                    if serverTurn:
-                        serverTurn = False
-                        for client in clients:
-                            client.startTurn()
-                        readyClients = []
+                    server_player.y -= 1
+                    server_player.moves -=1
+                    count = 0
+                if key_map[K_SPACE] or server_player.moves <= 0:
+                    print("end of server turn")
+                    server_player.moves = server_player.regen
+                    count = 0
+
+                    serverTurn = False
+                    for client in clients:
+                        client.startTurn()
+                    readyClients = []
+                    print("at end of turn readyClients are")
+                    print(readyClients)
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)
             lvl.draw()
             for client in clients:
                 client.draw()
-            square.draw()
+            server_player.draw()
             badgl.end_drawing()
             #sleep(0.01)
             count += 1

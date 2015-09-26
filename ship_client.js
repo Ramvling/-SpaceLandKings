@@ -119,7 +119,6 @@ function handleTurnStart(){
          $("#message").text("It's your turn!");
         turn = true;
         console.log("turn handled");   
-        player.moves += player.regen;
         $("#moves").text(player.moves);
     }
 }
@@ -136,6 +135,8 @@ function handleTurnOver(){
         packet.send();
         $("#moves").text(player.moves);
         $("#commands").text(commandString);
+
+        player.moves += player.regen;
 
         //note, when we do the whole big string thing at the end, this kind of message can be deleted
        // var packet = newPacket(TURN);

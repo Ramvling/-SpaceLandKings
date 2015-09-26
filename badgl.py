@@ -128,11 +128,20 @@ def make_and_setup_window(width, height):
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+angle = 0
+angle_delta = 0.10
 def start_drawing():
+    global angle
+    global angle_delta
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     glTranslate(0.0, 0.0, -2.5)
-    #glRotate(angle, 0.0, 1.0, 0.0)
+    angle += angle_delta
+    if angle > 20 or angle < -20:
+        angle_delta = -angle_delta
+    glRotate(-35, 1.0, 0.0, 0.0)
+    glRotate(angle, 0.0, 0.0, 1.0)
+    #glRotate(angle, 1.0, 0.0, 0.0)
 
 def end_drawing():
     pygame.display.flip()
