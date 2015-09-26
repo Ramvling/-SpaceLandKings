@@ -9,6 +9,10 @@ sys.path.insert(0, './PyWebPlug')
 from wsserver import *
 from time import sleep
 
+import pygame
+from pygame.locals import *
+import badgl
+
 
 clients = []
 pID = 0
@@ -54,7 +58,15 @@ def handle(socket):
     client = Client(socket, pID)
     clients.append(client)
 
+myo_pos_change = 11
+
 def main():
+    badgl.make_and_setup_window(640, 480)
+    square = badgl.SquareObject(1.0, 1.0)
+    quit = False
+    global myo_pos_change
+    myo_pos_change = 0
+
     global gameStarted
     global stage
     using_myo = False
@@ -62,15 +74,27 @@ def main():
         using_myo = True
         m = Myo(NNClassifier(), None)
         def handle_myo(it):
+            global myo_pos_change
             print("handling fo")
             print(it)
+            if (it > 2):
+                myo_pos_change = -1
+            elif it > 0:
+                myo_pos_change = 1
+            else:
+                it = 11
+            print(myo_pos_change)
         m.add_raw_pose_handler(handle_myo)
         m.connect()
 
     try:
         setupMessages()
         server = startServer()
-        while True:
+        count = 0
+        while not quit:
+            for e in pygame.event.get():
+                if e.type == QUIT:
+                    quit = True
             newClient = handleNetwork()
             if newClient:
                 handle(newClient)
@@ -78,11 +102,30 @@ def main():
             for client in clients:
                 client.handle()
             if using_myo:
+                myo_pos_change = 0
                 m.run()
+                square.x += myo_pos_change
+                #print(myo_pos_change)
+            #else:
+            key_map = pygame.key.get_pressed()
+            if key_map[K_LEFT]:
+                square.x += -1
+            elif key_map[K_RIGHT]:
+                square.x += 1
+            elif key_map[K_ESCAPE]:
+                quit = True
+            
+            badgl.start_drawing()
+            square.draw()
+            badgl.end_drawing()
             #sleep(0.01)
+            count += 1
+            if (not count % 200):
+                print(count)
     except KeyboardInterrupt:
         print(' recieved, closing server')
         server.close()
+        raise
 
 if __name__ == '__main__':
     main()
