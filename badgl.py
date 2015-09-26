@@ -189,6 +189,13 @@ def loadImage(path):
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
     return texture
 
+def drawText(position, string):
+    font = pygame.font.Font(None, 64)
+    text_surface = font.render(string, True, (255,255,255,255), (0,0,0,255))
+    text_data = pygame.image.tostring(text_surface, "RGBA", True)
+    glRasterPos3d(*position)
+    glDrawPixels(text_surface.get_width(), text_surface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, text_data)
+
 if __name__ == '__main__':
 
     make_and_setup_window(640, 480)
