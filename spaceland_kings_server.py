@@ -75,6 +75,8 @@ class Client:
                     self.position[2] += 1
                 elif (dirr == "Down"):
                     self.position[2] += -1
+            # since we don't need to do turn over naymore
+            readyClients.append(self)
         if msgID == 3:
             readyClients.append(self)
 
@@ -104,6 +106,7 @@ def handle(socket):
 myo_pos_change = 11
 
 def main():
+    global readyClients
 
     if len(readyClients) == len(clients):
         serverTurn = True;
@@ -158,26 +161,35 @@ def main():
                 print("New connection")
             for client in clients:
                 client.handle()
+
+            if len(readyClients) == len(clients) and not serverTurn:
+                serverTurn = True;
+                print("server turn");
+
             if using_myo:
                 myo_pos_change = 0
                 m.run()
-                square.x += myo_pos_change
+                if serverTurn:
+                    square.x += myo_pos_change
                 #print(myo_pos_change)
             #else:
             key_map = pygame.key.get_pressed()
-            if key_map[K_LEFT]:
-                square.x += -1
-            elif key_map[K_RIGHT]:
-                square.x += 1
-            elif key_map[K_UP]:
-                square.y += 1
-            elif key_map[K_DOWN]:
-                square.y -= 1
-            elif key_map[K_ESCAPE]:
+            if key_map[K_ESCAPE]:
                 quit = True
-            elif key_map[K_SPACE]:
-                for client in clients:
-                    client.startTurn()
+            if serverTurn:
+                if key_map[K_LEFT]:
+                    square.x += -1
+                elif key_map[K_RIGHT]:
+                    square.x += 1
+                elif key_map[K_UP]:
+                    square.y += 1
+                elif key_map[K_DOWN]:
+                    square.y -= 1
+                elif key_map[K_SPACE]:
+                    serverTurn = False
+                    for client in clients:
+                        client.startTurn()
+                    readyClients = []
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)

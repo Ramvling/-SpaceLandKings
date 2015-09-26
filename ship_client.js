@@ -108,7 +108,8 @@ function startConnection() {
     }
 
     // Start the connection!
-    wsconnect("ws://localhost:8886", onopen, onclose);
+    wsconnect("ws://128.61.70.189:8886", onopen, onclose);
+    //wsconnect("ws://localhost:8886", onopen, onclose);
 }
 
 function handleTurnStart(){
