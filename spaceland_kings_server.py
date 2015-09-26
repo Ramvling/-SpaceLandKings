@@ -1,7 +1,7 @@
 import sys
 ### myo-raw imports
 sys.path.insert(0, './myo-raw')
-import myo_raw
+from  myo import *
 
 ### PyWebPlug imports
 import string, cgi, time
@@ -57,6 +57,13 @@ def handle(socket):
 def main():
     global gameStarted
     global stage
+    m = Myo(NNClassifier(), None)
+    def handle_myo(it):
+        print("handling fo")
+        print(it)
+    m.add_raw_pose_handler(handle_myo)
+    m.connect()
+
     try:
         setupMessages()
         server = startServer()
@@ -66,7 +73,8 @@ def main():
                 handle(newClient)
             for client in clients:
                 client.handle()
-            sleep(0.01)
+            m.run()
+            #sleep(0.01)
     except KeyboardInterrupt:
         print(' recieved, closing server')
         server.close()

@@ -3,4 +3,4 @@
 	url = https://github.com/HiroLord/PyWebPlug.git
 [submodule "myo-raw"]
 	path = myo-raw
-	url = https://github.com/dzhu/myo-raw.git
+	url = https://github.com/Limvot/myo-raw.git
