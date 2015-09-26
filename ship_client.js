@@ -1,8 +1,10 @@
 // This is where we define our messages (similar to an enum)
 var MSG_LOGIN = 1;
 
-$(document).ready(function() {
+console.log("rawr");
 
+$(document).ready(function() {
+    console.log("rawr");
    // Setup our message objects (packets)
     setupMessages();
 
@@ -30,7 +32,8 @@ function setupMessages() {
 }
 
 function startConnection() {
-    // This will be called when the connection is successful
+    // This will be called when the connection is successful 
+    console.log("start connection called");
     var onopen = function() {
         // We ask for a new packet for type MSG_LOGIN
         var packet = newPacket(MSG_LOGIN);
