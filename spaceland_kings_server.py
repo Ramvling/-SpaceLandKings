@@ -358,6 +358,14 @@ def main():
                         server_player.position[1] -= 1
                         server_player.moves -=1
                         count = 0
+                    elif key_map[K_PAGEUP]:
+                        server_player.position[2] += 1
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_PAGEDOWN]:
+                        server_player.position[2] -= 1
+                        server_player.moves -=1
+                        count = 0
                     elif key_map[K_w]:
                         liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 0.1, advance(server_player.position, (0,1,0)), 10))
                         server_player.moves -=1
