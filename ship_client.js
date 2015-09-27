@@ -8,13 +8,21 @@ var GAMEOVER = 7;
 
 var INCOMING = false;
 var OUTGOING = true;
-var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3, score:0};
+var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:5, missles:3, bombs:3, score:0};
 var turn = true;
 var commandString = ""
 
 function handleMovement(dirr) {
     if (player.moves > 0) {
         commandString += dirr + " ";
+       player.moves -= 1;
+        $("#commands").text(commandString);
+        $("#moves").text(player.moves);
+    }
+}
+function handleFire() {
+    if (player.moves > 0) {
+        commandString += "Fire ";
        player.moves -= 1;
         $("#commands").text(commandString);
         $("#moves").text(player.moves);
@@ -58,6 +66,10 @@ $(document).ready(function() {
 
     $("#backward").click(function() {
         handleMovement("Backward");
+    });
+
+    $("#fire").click(function() {
+        handleFire();
     });
 
     // This interval can be used for anything, but it currently only handles incoming messaged.

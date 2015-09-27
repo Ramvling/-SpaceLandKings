@@ -114,6 +114,9 @@ class Client:
                     self.position[2] += 1
                 elif (dirr == "Down"):
                     self.position[2] += -1
+                elif (dirr == "Fire"):
+                    liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 0.1, advance(self.position, (0,1,0)), 10))
+                self.position = lvl.in_bounds_it(self.position)
                 lvl.events.runEvent(tuple(self.position), self)
             # since we don't need to do turn over naymore
             print("moving and appending to readyClients")
@@ -187,11 +190,12 @@ class Projectile:
         
 
 class ServerPlayer:
-    def __init__(self, moves, regen):
+    def __init__(self, moves, regen, health):
         self.position = [0,0,0]
         self.moves = moves
         self.regen = regen
         self.square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("king_face.bmp"))
+        self.health = health
 
     def draw(self):
         self.square.x = self.position[0]
@@ -213,23 +217,30 @@ class ServerPlayer:
             i += 0.3
 
         liveProjectiles += burst    
+    def hurt(self, damage):
+        self.health -= damage
+        print("hurt server")
+
+def advance(pos, tup):
+    return [pos[0] + tup[0], pos[1] + tup[1], pos[2] + tup[2]]
 
 myo_pos_change = 11
 def main():
     global readyClients
     game_over = False
     winner = None
+    winning_score = 5
 
     if len(readyClients) == len(clients):
         serverTurn = True;
         print("server turn");
-    badgl.make_and_setup_window(800, 800)
+    badgl.make_and_setup_window(1000, 1000)
 
-    server_player = ServerPlayer(10, 10)
+    server_player = ServerPlayer(10, 10, 200)
     server_player.z = 1
     
     lvl_size = 13
-    lvl = level.Level(lvl_size, lvl_size)
+    lvl = level.Level(lvl_size, lvl_size, lvl_size, winning_score*2)
     lvl.z = -0.1
     quit = False
     global myo_pos_change
@@ -276,27 +287,34 @@ def main():
                 handle(newClient)
                 print("New connection")
             all_dead = True if len(clients) > 0 else False
+            winning_client = None
             for client in clients:
                 client.handle(lvl)
                 if client.health > 0:
                     all_dead = False
-            if all_dead:
+                if client.diamondillium >= winning_score:
+                    winning_client = client
+            if all_dead and winning_client == None:
                 game_over = True
                 winner = server_player
+            elif winning_client != None:
+                game_over = True
+                winner = winning_client
 
             dead = []
             #projectiles loop
             for proj in liveProjectiles:
                 proj.move()
-                for client in clients:
-                    if proj.collide(client) or (proj.dead):
-                        client.hurt(proj.damage)
+                for entity in clients + [server_player]:
+                    if proj.collide(entity) or (proj.dead):
+                        entity.hurt(proj.damage)
                         proj.dead = True
                         print("dead")
                         dead.append(proj)
 
             for proj in dead:
-                liveProjectiles.remove(proj)
+                if proj in liveProjectiles:
+                    liveProjectiles.remove(proj)
 
             if len(readyClients) == len(clients) and not serverTurn:
                 serverTurn = True;
@@ -314,26 +332,27 @@ def main():
             if key_map[K_ESCAPE]:
                 quit = True
             if serverTurn and count > 10:
-                if key_map[K_LEFT]:
-                    server_player.position[0] += -1
-                    server_player.moves -=1
-                    count = 0
-                elif key_map[K_RIGHT]:
-                    server_player.position[0] += 1
-                    server_player.moves -=1
-                    count = 0
-                elif key_map[K_UP]:
-                    server_player.position[1] += 1
-                    server_player.moves -=1
-                    count = 0
-                elif key_map[K_DOWN]:
-                    server_player.position[1] -= 1
-                    server_player.moves -=1
-                    count = 0
-                elif key_map[K_TAB]:
-                    liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 1, server_player.position, 10))
-                    server_player.moves -=1
-                    count = 0
+                if server_player.health > 0:
+                    if key_map[K_LEFT]:
+                        server_player.position[0] += -1
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_RIGHT]:
+                        server_player.position[0] += 1
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_UP]:
+                        server_player.position[1] += 1
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_DOWN]:
+                        server_player.position[1] -= 1
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_TAB]:
+                        liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 0.1, advance(server_player.position, (0,1,0)), 10))
+                        server_player.moves -=1
+                        count = 0
                 if key_map[K_SPACE] or server_player.moves <= 0:
                     print("end of server turn")
                     server_player.moves = server_player.regen
@@ -345,6 +364,8 @@ def main():
                     readyClients = []
                     print("at end of turn readyClients are")
                     print(readyClients)
+
+                server_player.position = lvl.in_bounds_it(server_player.position)
             
             badgl.start_drawing()
             glTranslate(1, 1, -5)
@@ -354,18 +375,26 @@ def main():
             server_player.draw()
             for proj in liveProjectiles:
                 proj.draw()
+            glLoadIdentity()
             if game_over:
                 if winner == server_player:
-                    badgl.drawText((-10,12,-1), "THE SPACELAND KING WON")
+                    badgl.drawText((-0.95,0.85,-1), "THE SPACELAND KING WON")
                 else:
-                    badgl.drawText((-10,12,-1), "CROWN THE NEW SPACELAND KING: ")
-                while not pygame.key.get_pressed()[K_ESCAPE]:
-                    badgl.end_drawing()
+                    badgl.drawText((-0.95,0.85,-1), "CROWN THE NEW SPACELAND KING:")
+                    badgl.drawText((-0.95,0.75,-1), str(clients.index(winning_client)+1))
+                badgl.end_drawing()
+                while not (pygame.key.get_pressed()[K_ESCAPE] or pygame.key.get_pressed()[K_TAB]):
+                    sleep(0.01)
+                    #pass
                 # time to reset everything
                 for client in clients:
                     client.reset()
             else:
-                badgl.drawText((-10,12,-1), "WELCOME TO SPACELAND KINGS!")
+                if server_player.health > 0:
+                    badgl.drawText((-0.95,0.85,-1), "WELCOME TO SPACELAND KINGS!")
+                else:
+                    badgl.drawText((-0.95,0.85,-1), "SPACELAND KING IS DEAD.")
+                    badgl.drawText((-0.95,0.75,-1), "WHO WILL BE HIS SUCESSOR?!")
             badgl.end_drawing()
             #sleep(0.01)
             count += 1

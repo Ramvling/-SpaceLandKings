@@ -4,16 +4,17 @@ from OpenGL.GL import *
 import random
 
 class Level:
-    def __init__(self, width, height):
+    def __init__(self, width, height, depth, num_diamondillium):
         self.width = width
         self.height = height
+        self.depth = depth
         self.x = 0
         self.y = 0
         self.z = 0
         self.regular_square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("single_tile.bmp"))
         self.diamondillium_square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("diamondillium.bmp"))
 
-        diamondillium_pos = [(random.randrange(-width//2, width//2), random.randrange(-height//2, height//2),0) for i in range(5)]
+        diamondillium_pos = [(random.randrange(-width//2, width//2), random.randrange(-height//2, height//2),0) for i in range(num_diamondillium)]
         #diamondillium_pos = [(0,0,0), (1,1,1)]
         #print("the pos")
         #for i in diamondillium_pos:
@@ -47,6 +48,12 @@ class Level:
             glTranslate(self.x + special[0], self.y + special[1], self.z + special[2])
             self.special_positions[special].draw()
             glTranslate(-(self.x + special[0]), -(self.y + special[1]), -(self.z + special[2]))
+    def in_bounds_it(self, position):
+        return [min(max(position[0], -self.width//2), self.width//2 -1),
+                min(max(position[1], -self.height//2), self.height//2 -1),
+                min(max(position[2], 0), self.depth//2)]
+                #min(max(position[2], -self.depth//2), self.depth//2)]
+                
 
 
 
