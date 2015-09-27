@@ -190,7 +190,7 @@ def loadImage(path):
     return texture
 
 def drawText(position, string):
-    font = pygame.font.Font(None, 32)
+    font = pygame.font.Font(None, 64)
     text_surface = font.render(string, True, (255,255,255,255), (0,0,0,255))
     text_data = pygame.image.tostring(text_surface, "RGBA", True)
     glRasterPos3d(*position)

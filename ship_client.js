@@ -20,6 +20,14 @@ function handleMovement(dirr) {
         $("#moves").text(player.moves);
     }
 }
+function handleFire() {
+    if (player.moves > 0) {
+        commandString += "Fire ";
+       player.moves -= 1;
+        $("#commands").text(commandString);
+        $("#moves").text(player.moves);
+    }
+}
 
 $(document).ready(function() {
    // Setup our message objects (packets)
@@ -58,6 +66,10 @@ $(document).ready(function() {
 
     $("#backward").click(function() {
         handleMovement("Backward");
+    });
+
+    $("#fire").click(function() {
+        handleFire();
     });
 
     // This interval can be used for anything, but it currently only handles incoming messaged.
