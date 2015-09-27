@@ -114,8 +114,16 @@ class Client:
                     self.position[2] += 1
                 elif (dirr == "Down"):
                     self.position[2] += -1
-                elif (dirr == "Fire"):
+                elif (dirr == "FireF"):
                     liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 0.1, advance(self.position, (0,1,0)), 10))
+                elif (dirr == "FireL"):
+                    liveProjectiles.append(Projectile( 0.02, [-1, 0, 0], 0.1, advance(self.position, (-1,0,0)), 10))
+                elif (dirr == "FireR"):
+                    liveProjectiles.append(Projectile( 0.02, [1, 0, 0], 0.1, advance(self.position, (1,0,0)), 10))
+                elif (dirr == "FireB"):
+                    liveProjectiles.append(Projectile( 0.02, [0, -1, 0], 0.1, advance(self.position, (0,-1,0)), 10))
+
+
                 self.position = lvl.in_bounds_it(self.position)
                 lvl.events.runEvent(tuple(self.position), self)
             # since we don't need to do turn over naymore
@@ -307,7 +315,8 @@ def main():
                 proj.move()
                 for entity in clients + [server_player]:
                     if proj.collide(entity) or (proj.dead):
-                        entity.hurt(proj.damage)
+                        if not proj.dead:
+                            entity.hurt(proj.damage)
                         proj.dead = True
                         print("dead")
                         dead.append(proj)
@@ -349,8 +358,20 @@ def main():
                         server_player.position[1] -= 1
                         server_player.moves -=1
                         count = 0
-                    elif key_map[K_TAB]:
+                    elif key_map[K_w]:
                         liveProjectiles.append(Projectile( 0.02, [0, 1, 0], 0.1, advance(server_player.position, (0,1,0)), 10))
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_a]:
+                        liveProjectiles.append(Projectile( 0.02, [-1, 0, 0], 0.1, advance(server_player.position, (-1,0,0)), 10))
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_d]:
+                        liveProjectiles.append(Projectile( 0.02, [1, 0, 0], 0.1, advance(server_player.position, (1,0,0)), 10))
+                        server_player.moves -=1
+                        count = 0
+                    elif key_map[K_s]:
+                        liveProjectiles.append(Projectile( 0.02, [0, -1, 0], 0.1, advance(server_player.position, (0,-1,0)), 10))
                         server_player.moves -=1
                         count = 0
                 if key_map[K_SPACE] or server_player.moves <= 0:

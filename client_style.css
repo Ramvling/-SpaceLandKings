@@ -25,7 +25,7 @@
     height:50%;
     position:fixed;
     bottom: 0%;
-    background-color:#FF00FF
+    background-color:#FF00FF;
 }
 
 .button {
@@ -40,6 +40,11 @@
     height: 50%;
 }
 
+.buttonN {
+    width: 40%;
+    height: 16%;
+}
+
 
 
 #zconsole {
@@ -50,11 +55,13 @@
 }
 
 #attack_console {
-    width:25%;
-    height:50%;
     background-color:#FFFFFF;
     position:fixed;
-    right:0%;
+    top:0%;
+    left:0%;
+    right:50%;
+    width: 50%;
+    height: 100%;
 }
 
 

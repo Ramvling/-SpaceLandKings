@@ -20,9 +20,9 @@ function handleMovement(dirr) {
         $("#moves").text(player.moves);
     }
 }
-function handleFire() {
+function handleFire(dir) {
     if (player.moves > 0) {
-        commandString += "Fire ";
+        commandString += "Fire" + dir + " ";
        player.moves -= 1;
         $("#commands").text(commandString);
         $("#moves").text(player.moves);
@@ -68,8 +68,17 @@ $(document).ready(function() {
         handleMovement("Backward");
     });
 
-    $("#fire").click(function() {
-        handleFire();
+    $("#fireF").click(function() {
+        handleFire("F");
+    });
+    $("#fireL").click(function() {
+        handleFire("L");
+    });
+    $("#fireR").click(function() {
+        handleFire("R");
+    });
+    $("#fireB").click(function() {
+        handleFire("B");
     });
 
     // This interval can be used for anything, but it currently only handles incoming messaged.
@@ -146,6 +155,7 @@ function handleGameOver(msg) {
 function handleTurnStart(){
     if (!player.isDead) {
          $("#button_console").show();
+         $("#attack_console").show();
          $("#end_turn").show();
          $("#message").text("It's your turn!");
         turn = true;
@@ -156,6 +166,7 @@ function handleTurnStart(){
 
 function handleTurnOver(){
          $("#button_console").hide();
+         $("#attack_console").hide();
          $("#end_turn").hide();
          $("#message").text("'Waiting on other players");
         turn = false;
