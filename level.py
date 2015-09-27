@@ -4,7 +4,7 @@ from OpenGL.GL import *
 import random
 
 class Level:
-    def __init__(self, width, height):
+    def __init__(self, width, height, num_diamondillium):
         self.width = width
         self.height = height
         self.x = 0
@@ -13,7 +13,7 @@ class Level:
         self.regular_square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("single_tile.bmp"))
         self.diamondillium_square = badgl.SquareObject(1.0, 1.0, badgl.loadImage("diamondillium.bmp"))
 
-        diamondillium_pos = [(random.randrange(-width//2, width//2), random.randrange(-height//2, height//2),0) for i in range(5)]
+        diamondillium_pos = [(random.randrange(-width//2, width//2), random.randrange(-height//2, height//2),0) for i in range(num_diamondillium)]
         #diamondillium_pos = [(0,0,0), (1,1,1)]
         #print("the pos")
         #for i in diamondillium_pos:

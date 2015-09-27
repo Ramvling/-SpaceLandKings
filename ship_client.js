@@ -8,7 +8,7 @@ var GAMEOVER = 7;
 
 var INCOMING = false;
 var OUTGOING = true;
-var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:1, missles:3, bombs:3, score:0};
+var player = {position:[0,0,0],moves:10, health:100,isDead:false,regen:5, missles:3, bombs:3, score:0};
 var turn = true;
 var commandString = ""
 

@@ -219,6 +219,7 @@ def main():
     global readyClients
     game_over = False
     winner = None
+    winning_score = 5
 
     if len(readyClients) == len(clients):
         serverTurn = True;
@@ -229,7 +230,7 @@ def main():
     server_player.z = 1
     
     lvl_size = 13
-    lvl = level.Level(lvl_size, lvl_size)
+    lvl = level.Level(lvl_size, lvl_size, winning_score*2)
     lvl.z = -0.1
     quit = False
     global myo_pos_change
@@ -276,13 +277,19 @@ def main():
                 handle(newClient)
                 print("New connection")
             all_dead = True if len(clients) > 0 else False
+            winning_client = None
             for client in clients:
                 client.handle(lvl)
                 if client.health > 0:
                     all_dead = False
-            if all_dead:
+                if client.diamondillium >= winning_score:
+                    winning_client = client
+            if all_dead and winning_client == None:
                 game_over = True
                 winner = server_player
+            elif winning_client != None:
+                game_over = True
+                winner = winning_client
 
             dead = []
             #projectiles loop
@@ -296,7 +303,8 @@ def main():
                         dead.append(proj)
 
             for proj in dead:
-                liveProjectiles.remove(proj)
+                if proj in liveProjectiles:
+                    liveProjectiles.remove(proj)
 
             if len(readyClients) == len(clients) and not serverTurn:
                 serverTurn = True;
@@ -358,9 +366,11 @@ def main():
                 if winner == server_player:
                     badgl.drawText((-10,12,-1), "THE SPACELAND KING WON")
                 else:
-                    badgl.drawText((-10,12,-1), "CROWN THE NEW SPACELAND KING: ")
-                while not pygame.key.get_pressed()[K_ESCAPE]:
-                    badgl.end_drawing()
+                    badgl.drawText((-10,12,-1), "CROWN THE NEW SPACELAND KING: PLAYER " + str(clients.index(winning_client)+1))
+                badgl.end_drawing()
+                while not (pygame.key.get_pressed()[K_ESCAPE] or pygame.key.get_pressed()[K_TAB]):
+                    sleep(0.01)
+                    #pass
                 # time to reset everything
                 for client in clients:
                     client.reset()
